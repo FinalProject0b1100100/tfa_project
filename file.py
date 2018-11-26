@@ -73,3 +73,47 @@ def get_distance_duration(origin,destination,api_key):
     except:
         print("Something went wrong with requests.get")
 ## example :get_distance_duration('Columbia university','time squre',api_key)
+
+
+
+# create a network map with the distance between two point as edges
+# refer to course material in DATA ANALYTICS
+import networkx as nxt
+%matplotlib inline
+G_C=nx.Graph()
+node_labels=dict()
+nodes = list()
+
+# example: startpoint = 'Mona Museum New York'
+df1 = df['attraction']
+df1[len(df)] = startpoint
+
+for n in df1:
+    nodes.append(n)
+
+distances = [(df1[i],df1[j],get_distance_duration(df1[i],df1[j],api_key)[0]) for i in range(len(nodes)-1) for j in range(i+1,len(nodes))]    
+    
+for e in distances:
+    G_C.add_edge(e[0],e[1],distance=e[2])
+
+pos=nx.spring_layout(G_C) # positions for all nodes
+# nodes
+nx.draw_networkx_nodes(G_C,pos,
+                       node_color='r',
+                       node_size=500,
+                      alpha=0.8)
+# edges
+#nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
+nx.draw_networkx_edges(G_C,pos,
+                       edgelist=G_C.edges(),
+                       width=8,alpha=0.5,edge_color='b')
+node_name={}
+for node in G_C.nodes():
+    node_name[node]=str(node)
+nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
+node_name={}
+for node in G_C.nodes():
+    node_name[node]=str(node)
+nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
+plt.axis('off')
+plt.show() # display
