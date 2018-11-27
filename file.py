@@ -118,15 +118,17 @@ nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
 plt.axis('off')
 plt.show() # display
 
+#create a dictionary containing the distance between each place
+distances2 = [((df1[i],df1[j]),get_distance_duration(df1[i],df1[j],api_key)[0]) for i in range(len(nodes)) for j in range(len(nodes)) if j!=i]
+dict_=dict(distances2)
 # find all the ways visiting from startpoint and formulating a circle
 results = list()
 for y in df['attraction']:
     for x in list(nx.all_simple_paths(G_C,startpoint,y)):
         if len(x) == len(df1):
-            path_len = nx.shortest_path_length(G_C,startpoint,y,'distance')
+            path_len = get_distance_duration(startpoint,y,api_key)[0]
             for i in range(len(df1)-1):
-                path_len += nx.shortest_path_length(G_C,x[i],x[i+1],'distance')
-            
-        results.append((x,round(path_len,2)))
-results
-sorted(results,key = lambda x: x[1])
+                path_len += dict_[(x[i],x[i+1])]
+            results.append((x,round(path_len,2)))
+results = sorted(results,key = lambda x: x[1])
+result = results[0]
