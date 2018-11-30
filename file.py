@@ -149,16 +149,25 @@ plt.show() # display
 df2 = df
 df2 = df2.append([{'attraction':startpoint,'lat':get_lat_lng(startpoint,api_key)[0],'lng':get_lat_lng(startpoint,api_key)[1]}], ignore_index=True)
 
-# revise get_map function
+# revise get_map() function, add more information like price to the icon's text box
 def get_map(startpoint,result):
     import folium
     import os
     startpoint_ll = get_lat_lng(startpoint,api_key)
     m = folium.Map(location=startpoint_ll,zoom_start=14)
-    folium.Marker(startpoint_ll, popup = startpoint).add_to(m)
+    icon_hz = dict(prefix='fa', color='red', icon_color='darkred', icon='cny')
+    folium.Marker(startpoint_ll, popup = startpoint,
+                  icon=folium.Icon(color='green')).add_to(m)
     for i in range(len(df)):
             folium.Marker([df.iloc[i]['lat'],df.iloc[i]['lng']],
-                  popup='Attraction: '+df.iloc[i]['attraction']).add_to(m)
+                  popup='Attraction: '+df.iloc[i]['attraction']+ ';    Price:'+str(df.iloc[i]['price'])).add_to(m)
+    for i in route_edges:
+        lat1 = df2[df2['attraction']==i[0]]['lat'].iloc[0]
+        lng1 = df2[df2['attraction']==i[0]]['lng'].iloc[0]
+        lat2 = df2[df2['attraction']==i[1]]['lat'].iloc[0]
+        lng2 = df2[df2['attraction']==i[1]]['lng'].iloc[0]
+        ls = folium.PolyLine(locations=[[lat1,lng1],[lat2,lng2]],color='blue')
+        ls.add_to(m)
     return m
 # exmple : get_map('Museum of Modern Art',df2)    
 
@@ -166,5 +175,5 @@ def get_map(startpoint,result):
 # In[11]:
 
 
-get_map(startpoint,df)
+
 
