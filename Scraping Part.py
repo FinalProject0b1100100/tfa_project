@@ -199,3 +199,30 @@ raw_data_clean['attraction_duration'] = raw_duration
 raw_data_clean.to_csv("data.csv")
 
 =======================================================================================================================================================
+import pandas as pd
+
+# Init dataframe
+df = pd.read_csv("data.csv", index_col = 0)
+
+# Function to get lat & lng of each attractions
+def get_lat_lng(address_string,api_key):
+    response_data = get_location_data(address_string+'New York')
+    return (response_data['results'][0]['geometry']['location']['lat'],
+           response_data['results'][0]['geometry']['location']['lng'])
+
+list_ = df['attraction_name']
+lat = list()
+lng = list()
+for i in range(len(list_)):
+    print(i)
+    # We use our own api key here
+    location = get_lat_lng(list_[i], api_key)
+    lat.append(location[0])
+    lng.append(location[1])
+    
+# Add the lag & lng to our data table
+df['attraction_lat'] = lat
+df['attraction_lng'] = lng
+
+# Save it to csv
+df.to_csv("data_with_location.csv")
