@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[7]:
+# In[9]:
 
 
 # use google API to transform the locaiton into a string, which represents the longitude and latitude
@@ -47,23 +47,6 @@ class Recommandation:
         #create a new dict called 'self.distance_sort' to deposite sorted dict
         self.distance_sort = sorted(self.distance.items(), key=lambda d: d[1], reverse=True) 
         return self.distance_sort
-      
-        #extract the top 5 attractions by distance
-        count = 0
-        for key, value in self.distance_sort:
-            count += 1
-            self.attraction_pick[key] = value
-            return self.attraction_pick
-        if count >= 5:
-            break
-
-    
-    
-    
-
-
-# In[ ]:
-
 
 #calculate time duration to derive the number of places to visit
 class Sum_duration(Recommandation):
@@ -80,4 +63,19 @@ class Sum_duration(Recommandation):
             sum_time = sum_time + time
             n += 1
         return n
+
+class Pick_attractions(Recommandation, Sum_duration):
+    def __int__(self, distance_sort):
+        self.distance_sort = distance_sort
+        self.limit = super().sum_time
+        
+    #extract the top attractions by distance within time limit
+    def pick(self):
+        count = 0
+        for key, value in self.distance_sort:
+            count += 1
+            self.attraction_pick[key] = value
+            return self.attraction_pick
+        if count >= self.limit:
+            break  
 
