@@ -72,28 +72,71 @@ raw_data = pd.DataFrame(raw_data_list, columns = ['attraction_name', 'attraction
 # raw_data.to_csv("raw_data_list.csv")
 # raw_data = pd.read_csv()
 
-# Data Clean -- Add rank for popularity
-rank = range(1,91)
-raw_data['attraction_rank'] = rank
-
 # Data Clean -- Drop duplicated attraction_names and reset indexes
 raw_data_1 = raw_data.drop_duplicates(subset = ['attraction_name'], keep = 'first')
-raw_data_1=raw_data_1.reset_index(drop=True)
+raw_data_1 = raw_data_1.reset_index(drop=True)
 
 # Data Clean -- Re-classify attraction_types
 # Check attraction_type
 # raw_data_1['attraction_type'].unique()
-raw_data_1['attraction_type'].value_counts()
+# raw_data_1['attraction_type'].value_counts()
 
 # Classify those whose name and type has 'Museum' in it as 'Museum'
 for i in range(len(raw_data_1)):
     if ('Museum' in raw_data_1['attraction_name'][i])|('Museums' in raw_data_1['attraction_type'][i]):
         raw_data_1['attraction_type'][i] = 'Museum'
 
-raw_data_1
+# Since Hasted Kraeutler Gallery has closed, we should exclud this place
+raw_data_2 = raw_data_1[raw_data_1['attraction_type'] != 'Art Galleries']
+# raw_data_2['attraction_type'].value_counts()
 
-raw_data_1['attraction_type'].value_counts()
+# Change the type "Sights & Landmarks","Points of Interest & Landmarks","Historic Sites" into "Landmarks"
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Sights & Landmarks', 'attraction_type'] = 'Landmark'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Points of Interest & Landmarks', 'attraction_type'] = 'Landmark'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Historic Sites', 'attraction_type'] = 'Landmark'
+# raw_data_2['attraction_type'].value_counts()
 
+# Change the type "Shopping", "Tramways" ,"Transportation", "Architectural Buildings" into "Landmarks"
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Shopping', 'attraction_type'] = 'Neighborhoods'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Tramways', 'attraction_type'] = 'Neighborhoods'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Transportation', 'attraction_type'] = 'Neighborhoods'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Architectural Buildings', 'attraction_type'] = 'Neighborhoods'
+# raw_data_2['attraction_type'].value_counts()
+
+# Classify all the arts entertainments as "Art"
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Theaters', 'attraction_type'] = 'Art'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Ballets', 'attraction_type'] = 'Art'
+# raw_data_2['attraction_type'].value_counts()
+
+# Classify the type "Gardens", "Nature & Parks" as "Parks"
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Gardens', 'attraction_type'] = 'Parks'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Nature & Parks', 'attraction_type'] = 'Parks'
+# raw_data_2['attraction_type'].value_counts()
+
+# Classify the type "Churches & Cathedrals", "Sacred & Religious Sites" as "Religious Sites"
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Churches & Cathedrals', 'attraction_type'] = 'Religious Sites'
+raw_data_2.loc[raw_data_2['attraction_type'] == 'Sacred & Religious Sites', 'attraction_type'] = 'Religious Sites'
+# raw_data_2['attraction_type'].value_counts()
+
+# Since specific events only hold for specific seasons, we need to exclude them in our data list
+raw_data_3 = raw_data_2[raw_data_2['attraction_type'] != 'Events']
+raw_data_4 = raw_data_3[raw_data_3['attraction_type'] != 'Cultural Events']
+# raw_data_2['attraction_type'].value_counts()
+
+# Reset the index of the list
+raw_data_4=raw_data_4.reset_index(drop=True)
+
+# Add the popularity rank for all the locations in our list
+# Since when we scrap the web page, the order is actually according to the popularity, we only need to number our list of locations
+rank = range(1,len(raw_data_4) + 1)
+raw_data_4['attraction_rank'] = rank
+
+# Save the info of attractions as a csv file
+raw_data = pd.DataFrame(raw_data_4, columns = ['attraction_name', 'attraction_link', 'attraction_rating', 'attraction_type', 'attraction_rank'])
+# raw_data.to_csv("raw_data_clean.csv")
+# raw_data_clean = pd.read_csv("raw_data_clean")
+
+=======================================================================================================================================================
 
 
 import requests
