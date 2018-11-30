@@ -134,50 +134,68 @@ raw_data_4['attraction_rank'] = rank
 # Save the info of attractions as a csv file
 raw_data = pd.DataFrame(raw_data_4, columns = ['attraction_name', 'attraction_link', 'attraction_rating', 'attraction_type', 'attraction_rank'])
 # raw_data.to_csv("raw_data_clean.csv")
-# raw_data_clean = pd.read_csv("raw_data_clean")
+# raw_data_clean = pd.read_csv("raw_data_clean.csv", index_col=0)
+
+# Get the duration of each attraction
+list_ = list(raw_data_clean['attraction_link'])
+n = len(list_)
+res = list()
+# Scrap duration for each link of attraction
+for i in range(n):
+    # Keep track of the scraping process
+    # print(i)
+    # Initialize duration as 0
+    duration = 0
+        
+    url = list_[i]
+    response = requests.get(url)
+    # if not response.status_code == 200:
+    #     raise NameError('Something wrong with the scraping process!')
+    results_page = BeautifulSoup(response.content,'lxml')
+
+    info_table = results_page.find('div', class_="attractions-attraction-detail-about-card-AttractionDetailAboutCard__aboutCardWrapper--2I_lX")
+        
+    # Check if there is a suggested duration on the website
+    if info_table:
+        info = info_table.find_all('div', class_="attractions-attraction-detail-about-card-AttractionDetailAboutCard__section--WwZwR")
+        pattern = r'^Suggested duration'
+        duration = 0
+        for j in info:
+            match = re.search(pattern, j.get_text())
+            if match:
+                duration = j.get_text()
+    if duration:
+        res.append(duration)
+    # If there is no duration, count it as None
+    else:
+        res.append(None)
+		
+# Data Clean -- duration
+raw_duration = list()
+for i in range(len(res)):
+    if res[i]:
+        
+        # If the duration offered as a range, we will take the average
+        if re.search(r'-', res[i]):
+            pattern = r'\d-\d'
+            string = res[i]
+            match = re.findall(pattern, string)
+            a, b = match[0].split('-')
+            raw_duration.append((int(b) + int(a))/2)
+            
+        # If the duration offered a specific hour, we will only take that number as the duration
+        else:
+            match = re.findall(r'\d', res[i])
+            raw_duration.append(int(match[0]))
+            
+    # If no duration provided, we estimate the duration to be half an hour.
+    else:
+        raw_duration.append(0.5)
+
+# Add duration to our info table
+raw_data_clean['attraction_duration'] = raw_duration
+
+# Save the final info as a csv file
+raw_data_clean.to_csv("data.csv")
 
 =======================================================================================================================================================
-
-
-import requests
-from bs4 import BeautifulSoup
-import datetime
-raw_data_list = list()
-url = "https://www.tripadvisor.com/Attractions-g60763-Activities-New_York_City_New_York.html#ATTRACTION_SORT_WRAPPER"
-response = requests.get(url)
-if not response.status_code == 200:
-    raise NameError('Something wrong with the scraping process!')
-results_page = BeautifulSoup(response.content,'lxml')
-attraction_table = results_page.find('div',class_="attraction_list attraction_list_short ")
-attractions = attraction_table.find_all('div',class_="attraction_element")
-for attraction in attractions:
-    attraction_link = "https://www.tripadvisor.com" + attraction.find('a').get('href')
-    attraction_name = attraction.find('a').get_text()
-    attraction_rate = attraction.find('div',class_="rs rating").find('span').get('alt').split( )[0]
-    attraction_type = attraction.find('span',class_="matchedTag noTagImg").get_text()
-    raw_data_list.append((attraction_link,attraction_name,attraction_rate,attraction_type))
-    
-raw_data_list
-
-
-
-url1 = "https://www.tripadvisor.com/Attraction_Review-g60763-d267031-Reviews-Manhattan_Skyline-New_York_City_New_York.html"
-response1 = requests.get(url1)
-if not response1.status_code == 200:
-    print('Fail')
-
-	
-	
-results_page1 = BeautifulSoup(response1.content,'lxml')
-times = results_page1.find('span',class_="is-hidden-mobile header_detail")
-times = times.find_all('span',class_="time")
-open_time = list()
-for time in times:
-    temp = time.get_text().split( )[0]
-    temp = datetime.datetime.strptime(temp,'%I:%M')
-    open_time.append(temp)
-
-	
-	
-type(open_time[0])
-
