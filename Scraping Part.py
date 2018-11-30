@@ -2,6 +2,8 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import pandas as pd
+import csv
 
 # Link for attractions in tripadvisor
 url = "https://www.tripadvisor.com/Attractions-g60763-Activities-New_York_City_New_York.html#ATTRACTION_SORT_WRAPPER"
@@ -22,38 +24,53 @@ def get_attractions(url):
     # This unexpected change started at 11/29/2018
     # Thus the info from first page should be scraped separately
     attraction_table = results_page.find('div', class_="ui_container attractions-attraction-overview-main-TopPOIs__container--1-Iay")
-    attraction = attraction_table.find_all('li', class_="attractions-attraction-overview-main-TopPOIs__item--e3w3i")
+    attractions = attraction_table.find_all('li', class_="attractions-attraction-overview-main-TopPOIs__item--e3w3i")
     for attraction in attractions:
-        attraction_link = "https://www.tripadvisor.com" + attraction.find('a').get('href')
-        attraction_name = attraction.find('a').get_text()
-        attraction_rating = attraction.find('div',class_="ui_poi_review_rating").find('span')['class'][1][7:]
+        attraction_link = "https://www.tripadvisor.com" + attraction.find('a',rel="noopener noreferrer").get('href')
+        attraction_name = attraction.find('a',class_="attractions-attraction-overview-main-TopPOIs__name--3eQ8p").get_text()
+        attraction_rating = int(attraction.find('div',class_="ui_poi_review_rating").find('span').get('class')[1][7:])/10
         attraction_type = attraction.find('span',class_="attractions-commerce-CategoryTag__category_tag--9vIyT").get_text()
-        raw_data_list.append((attraction_link,attraction_name,attraction_rate,attraction_type))
-     
-    # Obtain link for next_page in page 1
-    next_page_url = "https://www.tripadvisor.com" + results_page.find('div',class_="attractions-attraction-overview-main-Pagination__link--2F1AA   ui_button primary attractions-attraction-overview-main-Pagination__button--1Nc9C").find('a').get('href')
+        raw_data_list.append((attraction_name, attraction_link, attraction_rating, attraction_type))
+        
+    # Obtain link for next  ge in page 1
+    next_page_url = "https://www.tripadvisor.com/Attractions-g60763-Activities-oa30-New_York_City_New_York.html"
 
     # For every page, do the loop to get link, name, rating and type of attractions
-    while (next_page_url != None):
+    # Since there are 38 pages of attractions in New York City, we think top 90 attractions will be enough to new tourists
+    # which means we only need 3 pages of attractions
+    page = 1
+    while (page < 3):
+        page += 1
+        response = requests.get(next_page_url)
+        
+        # Check if scraping the page successfully
+        if not response.status_code == 200:
+            raise NameError(f'Something wrong with the scraping process for page {page}!')
+
+        results_page = BeautifulSoup(response.content,'lxml')
+        
         attraction_table = results_page.find('div',class_="attraction_list attraction_list_short ")
         attractions = attraction_table.find_all('div',class_="attraction_element")
+        
         for attraction in attractions:
-            attraction_link = "https://www.tripadvisor.com" + attraction.find('a').get('href')
-            attraction_name = attraction.find('a').get_text()
-            attraction_rating = attraction.find('div',class_="rs rating").find('span').get('alt').split( )[0]
+            attraction_link = "https://www.tripadvisor.com" + attraction.find('div',class_="listing_title ").find('a').get('href')
+            attraction_name = attraction.find('div',class_="listing_title ").find('a').get_text()
+            attraction_rating = float(attraction.find('div',class_="rs rating").find('span').get('alt').split( )[0])
             attraction_type = attraction.find('span',class_="matchedTag noTagImg").get_text()
-            raw_data_list.append((attraction_link,attraction_name,attraction_rate,attraction_type))
-            
-            # Obtain next_page in all other pages until no page left
-            try:
-                next_page_url = "https://www.tripadvisor.com" + results_page.find('div',class_="unified pagination ").find('a').get('href')
-            except:
-                next_page_url = None
+            raw_data_list.append((attraction_name, attraction_link, attraction_rating, attraction_type))
+        
+        # Obtain the url of page 3 in page 2
+        next_page_url = "https://www.tripadvisor.com/Attractions-g60763-Activities-oa30-New_York_City_New_York.html#FILTERED_LIST"
+        
     # return all info of attractions
     return raw_data_list
 
+# Get the raw data list
+raw_data_list = get_attractions(url)
 
-
+# Save the info of attractions as a csv file
+raw_data = pd.DataFrame(raw_data_list, columns = ['attraction_name', 'attraction_link', 'attraction_rating', 'attraction_type'])
+raw_data.to_csv("raw_data_list.csv")
 
 
 url1 = "https://www.tripadvisor.com/Attraction_Review-g60763-d267031-Reviews-Manhattan_Skyline-New_York_City_New_York.html"

@@ -1,7 +1,17 @@
+
+# coding: utf-8
+
+# In[9]:
+
+
+startpoint = input('please key your starting point: >')
 import requests
+import matplotlib.pyplot as plt
+
 # try to find the latitude and longitude of a place
 # refer to couese material in Data Analytics
 # api_key can't be posed in github
+api_key = 'AIzaSyAcJo9m6XPc5L32vRt6BXTfeXdVxw81n78'
 
 # create a function to get the latitude and longitude of a place
 def get_location_data(address):
@@ -78,13 +88,13 @@ def get_distance_duration(origin,destination,api_key):
 
 # create a network map with the distance between two point as edges
 # refer to course material in DATA ANALYTICS
-import networkx as nxt
-%matplotlib inline
+import networkx as nx
+get_ipython().magic('matplotlib inline')
 G_C=nx.Graph()
 node_labels=dict()
 nodes = list()
 
-# example: startpoint = 'Mona Museum New York'
+# example: startpoint = 'Museum of modern art'
 df1 = df['attraction']
 df1[len(df)] = startpoint
 
@@ -95,28 +105,6 @@ distances = [(df1[i],df1[j],get_distance_duration(df1[i],df1[j],api_key)[0]) for
     
 for e in distances:
     G_C.add_edge(e[0],e[1],distance=e[2])
-
-pos=nx.spring_layout(G_C) # positions for all nodes
-# nodes
-nx.draw_networkx_nodes(G_C,pos,
-                       node_color='r',
-                       node_size=500,
-                      alpha=0.8)
-# edges
-#nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
-nx.draw_networkx_edges(G_C,pos,
-                       edgelist=G_C.edges(),
-                       width=8,alpha=0.5,edge_color='b')
-node_name={}
-for node in G_C.nodes():
-    node_name[node]=str(node)
-nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
-node_name={}
-for node in G_C.nodes():
-    node_name[node]=str(node)
-nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
-plt.axis('off')
-plt.show() # display
 
 #create a dictionary containing the distance between each place
 distances2 = [((df1[i],df1[j]),get_distance_duration(df1[i],df1[j],api_key)[0]) for i in range(len(nodes)) for j in range(len(nodes)) if j!=i]
@@ -131,4 +119,45 @@ for y in df['attraction']:
                 path_len += dict_[(x[i],x[i+1])]
             results.append((x,round(path_len,2)))
 results = sorted(results,key = lambda x: x[1])
-result = results[0]
+
+## result!
+route = results[0][0]
+distance_total = results[0][1]
+
+## edges of the result
+route_edges = [(route[i],route[i+1]) for i in range(len(route)-1)]
+route_edges.append((route[-1],route[0]))
+
+
+
+### draw the network
+pos=nx.spring_layout(G_C) # positions for all nodes
+# nodes
+nx.draw_networkx_nodes(G_C,pos,
+                       node_color='r',
+                       node_size=500,
+                      alpha=0.8)
+# edges
+#nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
+nx.draw_networkx_edges(G_C,pos,
+                       edgelist=G_C.edges(),
+                       width=8,alpha=0.5,edge_color='b')
+nx.draw_networkx_edges(G_C,pos,edgelist=route_edges,width=6)
+
+node_name={}
+for node in G_C.nodes():
+    node_name[node]=str(node)
+nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
+node_name={}
+for node in G_C.nodes():
+    node_name[node]=str(node)
+nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
+plt.axis('off')
+plt.show() # display
+
+
+# In[5]:
+
+
+
+
