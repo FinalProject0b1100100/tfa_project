@@ -5,6 +5,9 @@ from tkinter import messagebox
 
 class App(object):
     pref_list=["Shopping", "Event", "Museum", "Park"]
+    attration=["Central Park", "5th ave", "Chinatown", "St Patrick Church"]
+    phb_list=[]
+    var_list=[]  #for preference use
 
     def __init__(self, window):
 
@@ -40,34 +43,53 @@ class App(object):
         #   ptg_list.append(x)
         #for x in range(3):
         #    self.ptg_entry.menu.add_checkbutton ( label="Item"+str(x),variable=ptg_list[x])
-        #self.current_row+=1  
+        #self.current_row+=1
+
+        
+        #place have been 
+        self.phb_label=tk.Label(window,text="Places that you have been to:")
+        self.phb_label.grid(row=self.current_row, column=0)
+        self.phb_entry=  Menubutton (window, text="Please select all", relief=RAISED )
+        self.phb_entry.grid(row=self.current_row, column=1)
+        self.phb_entry.menu  =  Menu ( self.phb_entry, tearoff = 0 )
+        self.phb_entry["menu"]  =  self.phb_entry.menu
+        #####----------change this-----------####
+        for x in range(len(self.attration)):
+            x=IntVar()
+            self.phb_list.append(x)
+        for x in range(len(self.attration)):
+            self.phb_entry.menu.add_checkbutton ( label=self.attration[x],variable=self.phb_list[x])
+        self.current_row+=1    
+
+
+
         
         #citypass
-        self.cp_label=tk.Label(window,text="Did you buy citypass:")
-        self.cp_label.grid(row=self.current_row, column=0)
-        list_=["Yes", "No"]
-        self.cp_text=StringVar()
-        self.cp_entry=OptionMenu(window, self.cp_text, *list_)
-        self.cp_entry.grid(row=self.current_row, column=1)
-        self.current_row+=1
+        #self.cp_label=tk.Label(window,text="Did you buy citypass:")
+        #self.cp_label.grid(row=self.current_row, column=0)
+        #list_=["Yes", "No"]
+        #self.cp_text=StringVar()
+        #self.cp_entry=OptionMenu(window, self.cp_text, *list_)
+        #self.cp_entry.grid(row=self.current_row, column=1)
+        #self.current_row+=1
 
-        if self.cp_text.get()=="Yes":
+        #
             
-            #place have been 
-            self.phb_label=tk.Label(window,text="Places that you have been to:")
-            self.phb_label.grid(row=self.current_row, column=0)
-            self.phb_entry=  Menubutton (window, text="Please select all", relief=RAISED )
-            self.phb_entry.grid(row=self.current_row, column=1)
-            self.phb_entry.menu  =  Menu ( self.phb_entry, tearoff = 0 )
-            self.phb_entry["menu"]  =  self.phb_entry.menu
-        #####----------change this-----------####
-            phb_list=[]
-            for x in range(3):
-                x=IntVar()
-                phb_list.append(x)
-            for x in range(3):
-                self.phb_entry.menu.add_checkbutton ( label="Item"+str(x),variable=phb_list[x])
-            self.current_row+=1    
+#             #place have been 
+#             self.phb_label=tk.Label(window,text="Places that you have been to:")
+#             self.phb_label.grid(row=self.current_row, column=0)
+#             self.phb_entry=  Menubutton (window, text="Please select all", relief=RAISED )
+#             self.phb_entry.grid(row=self.current_row, column=1)
+#             self.phb_entry.menu  =  Menu ( self.phb_entry, tearoff = 0 )
+#             self.phb_entry["menu"]  =  self.phb_entry.menu
+#         #####----------change this-----------####
+#             phb_list=[]
+#             for x in range(3):
+#                 x=IntVar()
+#                 phb_list.append(x)
+#             for x in range(3):
+#                 self.phb_entry.menu.add_checkbutton ( label="Item"+str(x),variable=phb_list[x])
+#             self.current_row+=1    
 
         #preference
         self.preference_label=tk.Label(window,text="Attraction type preference:")
@@ -77,19 +99,18 @@ class App(object):
         self.preference_entry.menu  =  Menu ( self.preference_entry, tearoff = 0 )
         self.preference_entry["menu"]  =  self.preference_entry.menu
         #list_=["Shopping", "Event", "Museum", "Park"]
-        var_list=[]
-        for x in range(len(list_)):
+        for x in range(len(self.pref_list)):
             var=IntVar()
-            var_list.append(var)
-        for x in range(len(list_)):
-            self.preference_entry.menu.add_checkbutton ( label=self.pref_list[x],variable=var_list[x])
+            self.var_list.append(var)
+        for x in range(len(self.pref_list)):
+            self.preference_entry.menu.add_checkbutton ( label=self.pref_list[x],variable=self.var_list[x])
         self.current_row+=1 
         
         #sort
         self.sort_label=tk.Label(window,text="Sort by:")
         self.sort_label.grid(row=self.current_row, column=0)
         #####----------change this-----------####
-        list_=["Distance", "Duration","Rank"]
+        list_=["Distance","Rank"]
         self.sort_text=StringVar()
         self.sort_entry=OptionMenu(window, self.sort_text, *list_)
         self.sort_entry.grid(row=self.current_row, column=1)
@@ -109,35 +130,37 @@ class App(object):
         self.quit_button.grid(row=self.current_row, column=1, columnspan=1)
         self.current_row+=1
 
+    
+        
+
     def fetch(self):
         #create local variable
         home=self.home_text.get()
         duration=self.duration_text.get()
-        #preference
-        preference=[]
-        for x in range(len(self.pref_list)):
-            if x==1:
-                preference.append(preference[x])
-        #place_to_go=self.sex_text.get()
 
         #place_have_been
         place_have_been=[]
-        for x in range(3):
-            if x==1:
-                place_have_been.append(x)
-        citypass=self.cp_text.get()
+        for x in range(len(self.phb_list)):
+            if self.phb_list[x].get()==1:
+                place_have_been.append(self.attration[x])
+
+        #preference
+        preference=[]
+        for x in range(len(self.pref_list)):
+            if self.var_list[x].get()==1:
+                preference.append(self.pref_list[x])
+                
+        #citypass=self.cp_text.get()
         sort=self.sort_text.get()
+
     
         print(home)
         print(duration)
-        for x in range(len(place_have_been)):
-            print (place_have_been[x])
-        for x in range(len(preference)):
-            print(preference(x))
-        #print(place_to_go)
-        print(citypass)
         print(sort)
-        
+        for x in place_have_been:
+            print (x)
+        for x in preference:
+            print(x)
 
 
             
@@ -150,4 +173,3 @@ def main():
 #run the main function
 if __name__=="__main__":
     main()
-
