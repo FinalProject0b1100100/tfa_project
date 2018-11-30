@@ -87,39 +87,17 @@ class Pick_attractions(Recommandation, Sum_duration):
                 break
 
 
-# In[20]:
-
-
-import pandas as pd
-df_2 = pd.DataFrame({'attraction':['Columbia University','Manhattan Skyline','Time Square','Central Park'],'location':[(30,34),(34,33),(40,32),(50,42)],'duration':[2,3,1,1]})
-
-
-# In[24]:
-
-
-location_x = 30
-location_y = 20
-
-def get_distance(x):
-    return pow(x[0]-location_x,2)+ pow(x[1]-location_y,2)
-df_2['distance'] = df_2.apply(lambda x: get_distance(x['location']),axis = 1)
-df_2.sort_values(by='distance')
-df_2
-
-
 # In[17]:
 
 
 df_2
 
 
-# In[30]:
+# In[103]:
 
 
 # use google API to transform the locaiton into a string, which represents the longitude and latitude
 import math
-import numpy as np
-from pandas import DataFrame
 import pandas as pd
 
 
@@ -129,41 +107,101 @@ def recommendation(df, startpoint, visited, preference, duration):
     #duration is the upper limit of all selected attractions
     
     #exclude attractions that visitors has been before    
-    i = 0
-    while i< len(visited):
-        df_1 = df[(True - df['attraction'].isin([visited[i]]))] #df_1 now is the dataframe without rows whose name is in visited list
-        i += 1
+    i=0
+    while i < len(visited):
+        df = df[ ~ df['attraction'].str.contains(visited[i]) ]
+        i += 1 
+    df_1 = df
+    #df_1 now is the dataframe without rows whose name is in visited list
 
     #prefrence is the first criterion
-    self.df_2 = df_1.loc[df['type'].isin(preference)] #df_2 now is the dataframe only with rows whose 'type' is in preference list
+    df_2 = df_1.loc[df['type'].isin(preference)] #df_2 now is the dataframe only with rows whose 'type' is in preference list
         
     #distance is the second criterion   
     #get the x & y of startpoint
-    i= 0
     startpoint_x = startpoint[0]
     startpoint_y = startpoint[1]
-        
+
     #add the distance between startpoint and attractions as 'distance' to df_2
     def get_distance(x):
-        return 1 + math.sqrt(pow(x[0] - startpoint_x, 2)+ pow(x[1]- startpoint_y, 2))
-    df_2['distance'] = df_2.apply(lambda x: get_distance(x['location']),axis = 1)        
-    df_2.sort_values(by='distance') #df_2 now is the sorted dataframe by distance
+        return math.sqrt(pow(x[0] - startpoint_x, 2)+ pow(x[1]- startpoint_y, 2))
+    df_2['distance'] = df_2.apply(lambda x: get_distance(x['location']),axis = 1)  
+    df_3 = df_2.sort_values(by='distance') #df_3 now is the sorted dataframe by distance
 
     #calculate time duration to derive the number of places to visit
     n = 0
     sum_time = 0
+
     #extract the name of sorted attractions
     while sum_time < duration:
-        time = self.df_2.iloc[n]['duration']#extract time of the corresponding attractions
+        time = df_3.iloc[n]['duration']#extract time of the corresponding attractions
         sum_time = sum_time + time
         n += 1
     
     #extract the top attractions by distance within time limit
-    result = df_2.iloc[:n]
+    result = df_3.iloc[:n-1]
+    return result
 
 
-# In[31]:
+# In[104]:
 
 
-recommendation(df,'Columbia University', ['a'], ['museum'], 10)
+df = pd.DataFrame({'attraction':['Columbia University','Manhattan Skyline','Time Square','Central Park','Soho'],'location':[(3,4),(6,8),(5,12),(10,24),(9,12)],'duration':[1,2,3,4,5],'type':['University','Skyscraper','Square','Park','Shopping']})
+startpoint = (0,0)
+visited = ['Columbia University']
+preference = ['Shopping','Park','Square']
+duration = 9
+a = recommendation(df, startpoint, visited, preference, duration)
+a
+
+
+# In[67]:
+
+
+# test df_1
+i=0
+while i < len(visited):
+    df = df[ ~ df['attraction'].str.contains(visited[i]) ]
+    i += 1 
+df_1 = df
+df_1
+
+
+# In[68]:
+
+
+# test df_2
+df_2 = df.loc[df_1['type'].isin(preference)]
+# df_2 = df[ df_1['type'].str.contains(preference[0])]
+df_2
+
+
+# In[81]:
+
+
+import sys
+startpoint_x = startpoint[0]
+startpoint_y = startpoint[1]
+
+    #add the distance between startpoint and attractions as 'distance' to df_2
+def get_distance(x):
+    return math.sqrt(pow(x[0] - startpoint_x, 2)+ pow(x[1]- startpoint_y, 2))
+df_2['distance'] = df_2.apply(lambda x: get_distance(x['location']),axis = 1)  
+df_2.sort_values(by='distance')
+df_2    
+
+
+# In[84]:
+
+
+n = 0
+sum_time = 0
+duration = 2
+
+#extract the name of sorted attractions
+while sum_time < duration:
+    time = df_2.iloc[n]['duration']#extract time of the corresponding attractions
+    sum_time = sum_time + time
+    n += 1
+df_2.iloc[:n-1]
 
