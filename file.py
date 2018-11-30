@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[9]:
+# In[ ]:
 
 
 startpoint = input('please key your starting point: > ')
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # try to find the latitude and longitude of a place
 # refer to couese material in Data Analytics
 # api_key can't be posed in github
-api_key = 'AIzaSyAcJo9m6XPc5L32vRt6BXTfeXdVxw81n78'
+
 
 # create a function to get the latitude and longitude of a place
 def get_location_data(address):
@@ -74,7 +74,6 @@ def get_distance_duration(origin,destination,api_key):
 ## example :get_distance_duration('Columbia university','time squre',api_key)
 
 
-
 # create a network map with the distance between two point as edges
 # refer to course material in DATA ANALYTICS
 import networkx as nx
@@ -118,38 +117,37 @@ route_edges = [(route[i],route[i+1]) for i in range(len(route)-1)]
 route_edges.append((route[-1],route[0]))
 
 
+def get_network():
+    ### draw the network
+    pos=nx.spring_layout(G_C) # positions for all nodes
+    # nodes
+    nx.draw_networkx_nodes(G_C,pos,
+                           node_color='r',
+                           node_size=500,
+                          alpha=0.8)
+    # edges
+    #nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
+    nx.draw_networkx_edges(G_C,pos,
+                           edgelist=G_C.edges(),
+                           width=8,alpha=0.5,edge_color='b')
+    nx.draw_networkx_edges(G_C,pos,edgelist=route_edges,width=6)
 
-### draw the network
-pos=nx.spring_layout(G_C) # positions for all nodes
-# nodes
-nx.draw_networkx_nodes(G_C,pos,
-                       node_color='r',
-                       node_size=500,
-                      alpha=0.8)
-# edges
-#nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
-nx.draw_networkx_edges(G_C,pos,
-                       edgelist=G_C.edges(),
-                       width=8,alpha=0.5,edge_color='b')
-nx.draw_networkx_edges(G_C,pos,edgelist=route_edges,width=6)
+    node_name={}
+    for node in G_C.nodes():
+        node_name[node]=str(node)
 
-node_name={}
-for node in G_C.nodes():
-    node_name[node]=str(node)
-nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
-node_name={}
-for node in G_C.nodes():
-    node_name[node]=str(node)
-nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
-plt.axis('off')
-plt.show() # display
-
+    nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
+    node_name={}
+    for node in G_C.nodes():
+        node_name[node]=str(node)
+    nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
+    plt.axis('off')
+    plt.show() # display
 
 # get all information about starting point and attractions
+# click the icon and you will get all information
 df2 = df
 df2 = df2.append([{'attraction':startpoint,'lat':get_lat_lng(startpoint,api_key)[0],'lng':get_lat_lng(startpoint,api_key)[1]}], ignore_index=True)
-
-# revise get_map() function, add more information like price to the icon's text box
 def get_map(startpoint,result):
     import folium
     import os
@@ -160,7 +158,9 @@ def get_map(startpoint,result):
                   icon=folium.Icon(color='green')).add_to(m)
     for i in range(len(df)):
             folium.Marker([df.iloc[i]['lat'],df.iloc[i]['lng']],
-                  popup='Attraction: '+df.iloc[i]['attraction']+ ';    Price:'+str(df.iloc[i]['price'])).add_to(m)
+                  popup='Attraction: '+df.iloc[i]['attraction']
+                          + ';    Price:'+str(df.iloc[i]['price'])
+                          + ';    Address:'+str(df.iloc[i]['address'])).add_to(m)
     for i in route_edges:
         lat1 = df2[df2['attraction']==i[0]]['lat'].iloc[0]
         lng1 = df2[df2['attraction']==i[0]]['lng'].iloc[0]
@@ -169,11 +169,6 @@ def get_map(startpoint,result):
         ls = folium.PolyLine(locations=[[lat1,lng1],[lat2,lng2]],color='blue')
         ls.add_to(m)
     return m
-# exmple : get_map('Museum of Modern Art',df2)    
-
-
-# In[11]:
-
-
-
+# get_map(startpoint,df2)
+# get_network()
 
