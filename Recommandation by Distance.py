@@ -1,43 +1,7 @@
 
 # coding: utf-8
 
-# In[240]:
-
-
-import pandas as pd
-df = pd.read_csv("data_with_location.csv", index_col = 0)
-
-
-# In[241]:
-
-
-df.head()
-
-
-# In[242]:
-
-
-df = df.rename(index=str, columns={"attraction_name": "attraction", "attraction_type": "type", "attraction_rank": "rank", "attraction_duration": "duration", "attraction_lat": "lat", "attraction_lng": "lng"})
-
-
-# In[243]:
-
-
-loc = list()
-for i in range(len(df)):
-    a = df['lat'][i]
-    b = df['lng'][i]
-    loc.append((a, b))
-df['location'] = loc
-
-
-# In[244]:
-
-
-df.head()
-
-
-# In[254]:
+# In[286]:
 
 
 # import all the libraries
@@ -87,7 +51,7 @@ startpoint = 'museum of modern art'
 startpoint_location =  get_lat_lng(startpoint,api_key)
 visited = ['Central Park']
 preference = ['Park','Museum']
-duration = 9
+duration = 4
 priority = 'distance'
 
 def recommendation(df, startpoint, visited, preference, priority, duration = 24):
@@ -123,10 +87,11 @@ def recommendation(df, startpoint, visited, preference, priority, duration = 24)
     n = 0
     sum_time = 0
 
-    #extract the name of sorted attractions
-    while sum_time < duration & n < len(df_3):
-        time = df_3.iloc[n]['duration']#extract time of the corresponding attractions
-        sum_time =+ time
+    # extract the name of sorted attractions
+    while (sum_time < duration) & (n < len(df_3)):
+        time = df_3.iloc[n]['duration'] # extract time of the corresponding attractions
+#         print(time) test time
+        sum_time += time
         n += 1
     
     result = df_3.iloc[:n-1]
