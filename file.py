@@ -4,10 +4,11 @@
 # In[ ]:
 
 
-startpoint = input('please key your starting point: > ')
+startpoint = 'museum of modern '
 import requests
 import matplotlib.pyplot as plt
 
+api_key = 'AIzaSyAcJo9m6XPc5L32vRt6BXTfeXdVxw81n78'
 # try to find the latitude and longitude of a place
 # refer to couese material in Data Analytics
 # api_key can't be posed in github
@@ -44,16 +45,22 @@ def get_address(address_string,api_key):
 
 # create imaginary sample data (since the data from web crawler part is not accessible now)
 import pandas as pd
-df = pd.DataFrame({'attraction':['Columbia University','Manhattan Skyline','Time Square','Central Park'],'price':[1,2,1,3]})
+df = pd.DataFrame({'attraction':['Columbia University','Manhattan Skyline','Time Square','Central Park'],
+                   'attraction_link':['www.123.com','www.123.com','www.123.com','www.123.com'],
+                   'attraction_rating':[1,2,1,3],'type':['Museum','Museum','Museum','Museum'],
+                  'duration':[0.5,1.5,0.5,1.5],
+                  'lat':[40.7532, 40.7575, 40.7477, 40.7493],
+                  'lng':[-73.9823, -73.9870, -73.9872, -73.9814]}
+                 )
 # apply former function into data sample
-df['lat'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[0],axis=1)
-df['lng'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[1],axis=1)
+## df contains 'lat&lng' now
+# df['lat'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[0],axis=1)
+# df['lng'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[1],axis=1)
 df['address'] = df.apply(lambda x: get_address(x['attraction'],api_key),axis=1)
 
 
 # create a function to get distance and duration from one place to another place
-def get_distance_duration(origin,destination,api_key):
-    
+def get_distance_duration(origin,destination,api_key):    
     result = list()
     origin = origin.replace(' ','+')
     destination = destination.replace(' ','+')
@@ -124,7 +131,7 @@ def get_network():
     nx.draw_networkx_nodes(G_C,pos,
                            node_color='r',
                            node_size=500,
-                          alpha=0.8)
+                           alpha=0.8)
     # edges
     #nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
     nx.draw_networkx_edges(G_C,pos,
@@ -154,13 +161,13 @@ def get_map(startpoint,result):
     startpoint_ll = get_lat_lng(startpoint,api_key)
     m = folium.Map(location=startpoint_ll,zoom_start=14)
     icon_hz = dict(prefix='fa', color='red', icon_color='darkred', icon='cny')
-    folium.Marker(startpoint_ll, popup = startpoint,
-                  icon=folium.Icon(color='green')).add_to(m)
+    folium.Marker(startpoint_ll, popup = startpoint,icon=folium.Icon(color='green')).add_to(m)
     for i in range(len(df)):
             folium.Marker([df.iloc[i]['lat'],df.iloc[i]['lng']],
-                  popup='Attraction: '+df.iloc[i]['attraction']
-                          + ';    Price:'+str(df.iloc[i]['price'])
-                          + ';    Address:'+str(df.iloc[i]['address'])).add_to(m)
+                            popup='Attraction: '+df.iloc[i]['attraction']+ ';   Address: '+df.iloc[i]['address']
+                          + ';   duration: ' +str(df.iloc[i]['duration'])+';   type: ' +df.iloc[i]['type']
+                          + ';   link: ' +df.iloc[i]['attraction_link']
+                             ).add_to(m)
     for i in route_edges:
         lat1 = df2[df2['attraction']==i[0]]['lat'].iloc[0]
         lng1 = df2[df2['attraction']==i[0]]['lng'].iloc[0]
