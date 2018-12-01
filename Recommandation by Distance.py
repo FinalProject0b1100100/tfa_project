@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[286]:
+# In[1]:
 
 
 # import all the libraries
@@ -45,6 +45,12 @@ def get_location_data(address):
     except:
         print("Something went wrong with requests.get")
     return response_data
+
+# get _lat_lng
+def get_lat_lng(address_string,api_key):
+    response_data = get_location_data(address_string+'New York')
+    return (response_data['results'][0]['geometry']['location']['lat'],
+           response_data['results'][0]['geometry']['location']['lng'])
 
 # these are continued to be substituted
 startpoint = 'museum of modern art'
@@ -90,7 +96,6 @@ def recommendation(df, startpoint, visited, preference, priority, duration = 24)
     # extract the name of sorted attractions
     while (sum_time < duration) & (n < len(df_3)):
         time = df_3.iloc[n]['duration'] # extract time of the corresponding attractions
-#         print(time) test time
         sum_time += time
         n += 1
     
