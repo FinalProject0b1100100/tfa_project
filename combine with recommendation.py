@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import os
 import math
 import requests
@@ -135,12 +129,12 @@ class App(object):
         #citypass=self.cp_text.get()
         sort=self.sort_text.get()
 
-        print (self.recommendation(self.df, home, place_have_been, preference, sort, duration = time))
+        print(self.recommendation(self.df, home, place_have_been, preference, sort, duration = time))
     
         
 
     # get_location
-    def get_location_data(address):
+    def get_location_data(self, address):
         response_data = ''
         url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (address,self.api_key)
         try:
@@ -162,7 +156,7 @@ class App(object):
         response_data = self.get_location_data(address_string+'New York')
         return (response_data['results'][0]['geometry']['location']['lat'], response_data['results'][0]['geometry']['location']['lng'])
 
-    def recommendation(df, startpoint, visited, preference, priority, duration = 24):
+    def recommendation(self, df, startpoint, visited, preference, priority, duration = 24):
     #startpoint is a string usually recording the hotel's longtitude and latitude
     #visited is a string recording where you have been
     #preference is a string representing the type of attractions that you want to visit
@@ -197,7 +191,7 @@ class App(object):
         return result
     
     #get the x & y of startpoint
-    def get_distance(location, startpoint):
+    def get_distance(self,location, startpoint):
             startpoint_x = startpoint_location[0]
             startpoint_y = startpoint_location[1]
             return math.sqrt(pow(location[0] - startpoint_x, 2)+ pow(location[1]- startpoint_y, 2))
@@ -212,10 +206,4 @@ def main():
 #run the main function
 if __name__=="__main__":
     main()
-
-
-# In[ ]:
-
-
-
 
