@@ -1,11 +1,22 @@
 import os
+import pandas as pd
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
 
 class App(object):
-    pref_list=["Shopping", "Event", "Museum", "Park"]
-    attration=["Central Park", "5th ave", "Chinatown", "St Patrick Church"]
+    data=pd.read_csv("data_with_location.csv", index_col=0)
+    list_=data['attraction_type'].unique()
+    att_list=data['attraction_name']
+    attration=[]
+    pref_list=[]
+    for x in list_:
+        pref_list.append(x)
+    for x in att_list:
+        attration.append(x)
+    
+    #pref_list=["Shopping", "Event", "Museum", "Park"]
+    #attration=["Central Park", "5th ave", "Chinatown", "St Patrick Church"]
     phb_list=[]
     var_list=[]  #for preference use
 
@@ -153,6 +164,8 @@ class App(object):
         #citypass=self.cp_text.get()
         sort=self.sort_text.get()
 
+        
+
     
         print(home)
         print(duration)
@@ -161,6 +174,8 @@ class App(object):
             print (x)
         for x in preference:
             print(x)
+    
+        return [home, duration, place_have_been, preference, sort]
 
 
             
