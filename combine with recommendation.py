@@ -87,7 +87,7 @@ class App(object):
         self.sort_label=tk.Label(window,text="Sort by:")
         self.sort_label.grid(row=self.current_row, column=0)
         #####----------change this-----------####
-        list_=["Distance","Rank"]
+        list_=["distance","rank"]
         self.sort_text=StringVar()
         self.sort_entry=OptionMenu(window, self.sort_text, *list_)
         self.sort_entry.grid(row=self.current_row, column=1)
@@ -111,7 +111,6 @@ class App(object):
     def fetch(self):
         #create local variable
         home=self.home_text.get()
-        home=self.get_lat_lng(home)
         time=self.duration_text.get()
 
         #place_have_been
@@ -129,7 +128,7 @@ class App(object):
         #citypass=self.cp_text.get()
         sort=self.sort_text.get()
 
-        print(self.recommendation(self.df, home, place_have_been, preference, sort, duration = time))
+        self.recommendation(self.df, home, place_have_been, preference, sort, duration = time)
     
         
 
@@ -162,7 +161,7 @@ class App(object):
     #preference is a string representing the type of attractions that you want to visit
     #priority is crorder by rank or distance
     #duration is the upper time limit of all selected attractions
-    
+        startpoint_location=self.get_lat_lng(startpoint)
     #exclude attractions that visitors has been before    
         i=0
         while i < len(visited):
@@ -172,7 +171,7 @@ class App(object):
 
     
         df_2 = df_1[df_1['type'].isin(preference)]#df_2 now is the dataframe only with rows whose 'type' is in preference list
-        df_2['distance'] = df_2.apply(lambda x: self.get_distance(x['location']),axis = 1)
+        df_2['distance'] = df_2.apply(lambda x: self.get_distance(x['location'], startpoint_location),axis = 1)
         #When sorting by distance, ascending. When sorting by rank, descending.
         df_3 = df_2.sort_values(by=priority,ascending=(priority=='distance')) # df_3 now is the sorted dataframe by priority('distance' or 'rank')
 
@@ -191,7 +190,7 @@ class App(object):
         return result
     
     #get the x & y of startpoint
-    def get_distance(self,location, startpoint):
+    def get_distance(self,location, startpoint_location):
             startpoint_x = startpoint_location[0]
             startpoint_y = startpoint_location[1]
             return math.sqrt(pow(location[0] - startpoint_x, 2)+ pow(location[1]- startpoint_y, 2))
@@ -206,4 +205,3 @@ def main():
 #run the main function
 if __name__=="__main__":
     main()
-
