@@ -188,7 +188,7 @@ class App(object):
         dff2 = dff
         dff2 = dff2.append([{'attraction':home,'lat':self.get_lat_lng(home)[0],'lng':self.get_lat_lng(home)[1]}], ignore_index=True)
         
-        print(self.get_map(home,dff,dff2, route_edges))
+        display(self.get_map(home,dff,dff2, route_edges))
 
     def get_map(self,startpoint,dff,dff2, route_edges):
         startpoint_ll = self.get_lat_lng(startpoint)
@@ -304,10 +304,10 @@ def main():
     window=tk.Tk()
     start=App(window)
     window.mainloop()
-
 #run the main function
 if __name__=="__main__":
     main()
+
 
 
 
