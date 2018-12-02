@@ -17,9 +17,14 @@ Equipments to Explore Path Planner
     # Packages for data visualization
 	import matplotlib.pyplot as plt
 	import networkx as nx
+	!pip install folium
 	import folium
 
 2. Google Maps API key
 Google Maps API key is literally the key to open this path planner.
 Click this link: https://cloud.google.com/console/google/maps-apis/overview, you will own your own API keys immediately.
 Click this link: https://developers.google.com/maps/documentation/maps-static/get-api-key, you will know how to install and use your keys step by step.
+
+3. A dataset
+Click this link:https://github.com/FinalProject0b1100100/tfa_project/blob/master/data_with_location.csv, and download the dataset named "data_with_location"
+It is the dataset that we fetched from Tripadviser.
