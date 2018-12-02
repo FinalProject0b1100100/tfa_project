@@ -1,5 +1,4 @@
 ## Path Planner: Your Best Travel Partner in the City of New York :statue_of_liberty:     
----
 
 ### What is it?  
 ---
