@@ -36,7 +36,6 @@ class App(object):
     #attration=["Central Park", "5th ave", "Chinatown", "St Patrick Church"]
     phb_list=[]
     var_list=[]  #for preference use
-    api_key = 'AIzaSyAcJo9m6XPc5L32vRt6BXTfeXdVxw81n78'
     
     def __init__(self, window):
 
@@ -143,8 +142,9 @@ class App(object):
         #citypass=self.cp_text.get()
         sort=self.sort_text.get()
         
-        dff=self.recommendation(self.df, home, place_have_been, preference, sort, duration = time)
-        dff['address'] = dff.apply(lambda x: self.get_address(x['attraction']),axis=1)
+        dff=self.recommendation(self.df, home, place_have_been, preference, sort, api_key, duration = time)
+        display(dff)
+        dff['address'] = dff.apply(lambda x: self.get_address(x['attraction'],api_key),axis=1)
         
         get_ipython().magic('matplotlib inline')
         G_C=nx.Graph()
@@ -158,20 +158,20 @@ class App(object):
         for n in dff1:
             nodes.append(n)
 
-        distances = [(dff1[i],dff1[j],self.get_distance_duration(dff1[i],dff1[j],self.api_key)[0]) for i in range(len(nodes)-1) for j in range(i+1,len(nodes))]    
+        distances = [(dff1[i],dff1[j],self.get_distance_duration(dff1[i],dff1[j],api_key)[0]) for i in range(len(nodes)-1) for j in range(i+1,len(nodes))]    
     
         for e in distances:
             G_C.add_edge(e[0],e[1],distance=e[2])
 
         #create a dictionary containing the distance between each place
-        distances2 = [((dff1[i],dff1[j]),self.get_distance_duration(dff1[i],dff1[j],self.api_key)[0]) for i in range(len(nodes)) for j in range(len(nodes)) if j!=i]
+        distances2 = [((dff1[i],dff1[j]),self.get_distance_duration(dff1[i],dff1[j],api_key)[0]) for i in range(len(nodes)) for j in range(len(nodes)) if j!=i]
         dict_=dict(distances2)
         # find all the ways visiting from startpoint and formulating a circle
         results = list()
         for y in dff['attraction']:
             for x in list(nx.all_simple_paths(G_C,home,y)):
                 if len(x) == len(dff1):
-                    path_len = self.get_distance_duration(home,y,self.api_key)[0]
+                    path_len = self.get_distance_duration(home,y,api_key)[0]
                     for i in range(len(dff1)-1):
                         path_len += dict_[(x[i],x[i+1])]
                     results.append((x,round(path_len,2)))
@@ -180,18 +180,19 @@ class App(object):
         ## result!
         route = results[0][0]
         distance_total = results[0][1]
+        
 
         ## edges of the result
         route_edges = [(route[i],route[i+1]) for i in range(len(route)-1)]
         route_edges.append((route[-1],route[0]))
 
         dff2 = dff
-        dff2 = dff2.append([{'attraction':home,'lat':self.get_lat_lng(home)[0],'lng':self.get_lat_lng(home)[1]}], ignore_index=True)
+        dff2 = dff2.append([{'attraction':home,'lat':self.get_lat_lng(home,api_key)[0],'lng':self.get_lat_lng(home,api_key)[1]}], ignore_index=True)
         
-        display(self.get_map(home,dff,dff2, route_edges))
+        display(self.get_map(home,dff,dff2, route_edges, api_key))
 
-    def get_map(self,startpoint,dff,dff2, route_edges):
-        startpoint_ll = self.get_lat_lng(startpoint)
+    def get_map(self,startpoint,dff,dff2, route_edges, api_key):
+        startpoint_ll = self.get_lat_lng(startpoint,api_key)
         m = folium.Map(location=startpoint_ll,zoom_start=14)
         icon_hz = dict(prefix='fa', color='red', icon_color='darkred', icon='cny')
         folium.Marker(startpoint_ll, popup = startpoint,icon=folium.Icon(color='green')).add_to(m)
@@ -211,9 +212,9 @@ class App(object):
         return m
     
     # get_location
-    def get_location_data(self, address):
+    def get_location_data(self, address, api_key):
         response_data = ''
-        url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (address,self.api_key)
+        url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (address,api_key)
         try:
             response = requests.get(url)
             if not response.status_code == 200:
@@ -229,17 +230,17 @@ class App(object):
 
         # get _lat_lng
         """this method and api_key is never used """
-    def get_lat_lng(self,address_string):
-        response_data = self.get_location_data(address_string+'New York')
+    def get_lat_lng(self,address_string, api_key):
+        response_data = self.get_location_data(address_string+'New York', api_key)
         return (response_data['results'][0]['geometry']['location']['lat'], response_data['results'][0]['geometry']['location']['lng'])
 
-    def recommendation(self, df, startpoint, visited, preference, priority, duration = 24):
+    def recommendation(self, df, startpoint, visited, preference, priority,api_key, duration = 24):
     #startpoint is a string usually recording the hotel's longtitude and latitude
     #visited is a string recording where you have been
     #preference is a string representing the type of attractions that you want to visit
     #priority is crorder by rank or distance
     #duration is the upper time limit of all selected attractions
-        startpoint_location=self.get_lat_lng(startpoint)
+        startpoint_location=self.get_lat_lng(startpoint,api_key)
         #exclude attractions that visitors has been before    
         i=0
         while i < len(visited):
@@ -273,8 +274,8 @@ class App(object):
             startpoint_y = startpoint_location[1]
             return math.sqrt(pow(location[0] - startpoint_x, 2)+ pow(location[1]- startpoint_y, 2))
     
-    def get_address(self,address_string):
-        response_data = self.get_location_data(address_string+'New York')
+    def get_address(self,address_string,api_key):
+        response_data = self.get_location_data(address_string+'New York', api_key)
         return response_data['results'][0]['formatted_address']    
     
     
