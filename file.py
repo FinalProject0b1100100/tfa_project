@@ -4,58 +4,17 @@
 # In[ ]:
 
 
-startpoint = 'museum of modern '
-import requests
-import matplotlib.pyplot as plt
+# read data from recommendation 
+df = self.recommendation(self.df, home, place_have_been, preference, sort, duration = time)
 
-api_key = 'AIzaSyAcJo9m6XPc5L32vRt6BXTfeXdVxw81n78'
-# try to find the latitude and longitude of a place
-# refer to couese material in Data Analytics
-# api_key can't be posed in github
-
-
-# create a function to get the latitude and longitude of a place
-def get_location_data(address):
-    response_data = ''
-    url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (address,api_key)
-    try:
-        response = requests.get(url)
-        if not response.status_code == 200:
-            print("HTTP error",response.status_code)
-        else:
-            try:
-                response_data = response.json()
-            except:
-                print("Response not in valid JSON format")
-    except:
-        print("Something went wrong with requests.get")
-    return response_data
-def get_lat_lng(address_string,api_key):
-    response_data = get_location_data(address_string+'New York')
-    return (response_data['results'][0]['geometry']['location']['lat'],
-           response_data['results'][0]['geometry']['location']['lng'])
-# example: get_lat_lng("Columbia University",api_key)
-
-# create a function to get the address of a place in details
+# create a function to get the address of a place in details, refer to couese material in Data Analytics
 def get_address(address_string,api_key):
     response_data = get_location_data(address_string+'New York')
     return response_data['results'][0]['formatted_address']
 # example: get_address("Columbia University",api_key)
 
 
-# create imaginary sample data (since the data from web crawler part is not accessible now)
-import pandas as pd
-df = pd.DataFrame({'attraction':['Columbia University','Manhattan Skyline','Time Square','Central Park'],
-                   'attraction_link':['www.123.com','www.123.com','www.123.com','www.123.com'],
-                   'attraction_rating':[1,2,1,3],'type':['Museum','Museum','Museum','Museum'],
-                  'duration':[0.5,1.5,0.5,1.5],
-                  'lat':[40.7532, 40.7575, 40.7477, 40.7493],
-                  'lng':[-73.9823, -73.9870, -73.9872, -73.9814]}
-                 )
 # apply former function into data sample
-## df contains 'lat&lng' now
-# df['lat'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[0],axis=1)
-# df['lng'] = df.apply(lambda x: get_lat_lng(x['attraction'],api_key)[1],axis=1)
 df['address'] = df.apply(lambda x: get_address(x['attraction'],api_key),axis=1)
 
 
@@ -123,34 +82,6 @@ distance_total = results[0][1]
 route_edges = [(route[i],route[i+1]) for i in range(len(route)-1)]
 route_edges.append((route[-1],route[0]))
 
-
-def get_network():
-    ### draw the network
-    pos=nx.spring_layout(G_C) # positions for all nodes
-    # nodes
-    nx.draw_networkx_nodes(G_C,pos,
-                           node_color='r',
-                           node_size=500,
-                           alpha=0.8)
-    # edges
-    #nx.draw_networkx_edges(sub_graph,pos,width=1.0,alpha=0.5)
-    nx.draw_networkx_edges(G_C,pos,
-                           edgelist=G_C.edges(),
-                           width=8,alpha=0.5,edge_color='b')
-    nx.draw_networkx_edges(G_C,pos,edgelist=route_edges,width=6)
-
-    node_name={}
-    for node in G_C.nodes():
-        node_name[node]=str(node)
-
-    nx.draw_networkx_edge_labels(G_C,pos,font_size=10)
-    node_name={}
-    for node in G_C.nodes():
-        node_name[node]=str(node)
-    nx.draw_networkx_labels(G_C,pos,node_name,font_size=8)
-    plt.axis('off')
-    plt.show() # display
-
 # get all information about starting point and attractions
 # click the icon and you will get all information
 df2 = df
@@ -165,8 +96,8 @@ def get_map(startpoint,result):
     for i in range(len(df)):
             folium.Marker([df.iloc[i]['lat'],df.iloc[i]['lng']],
                             popup='Attraction: '+df.iloc[i]['attraction']+ ';   Address: '+df.iloc[i]['address']
-                          + ';   duration: ' +str(df.iloc[i]['duration'])+';   type: ' +df.iloc[i]['type']
-                          + ';   link: ' +df.iloc[i]['attraction_link']
+                          + ';   Duration: ' +str(df.iloc[i]['duration'])+' hour(s);   Type: ' +df.iloc[i]['type']
+                          + ';   Link: ' +df.iloc[i]['attraction_link']
                              ).add_to(m)
     for i in route_edges:
         lat1 = df2[df2['attraction']==i[0]]['lat'].iloc[0]
@@ -177,5 +108,4 @@ def get_map(startpoint,result):
         ls.add_to(m)
     return m
 # get_map(startpoint,df2)
-# get_network()
 
