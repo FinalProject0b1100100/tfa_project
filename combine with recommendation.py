@@ -35,7 +35,7 @@ class App(object):
     
     def __init__(self, window):
 
-        window.wm_title("Travel Assistant")
+        window.wm_title("Path Planner")
         self.current_row=0
         #api key
         self.api_label=tk.Label(window,text="Your API key:")
