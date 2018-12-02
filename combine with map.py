@@ -10,9 +10,10 @@ from tkinter import messagebox
 import folium
 import networkx as nx
 
+#create a window that allows users to make input
 class App(object):
     df=pd.read_csv("data_with_location.csv", index_col=0)
-    df = df.rename(index=str, columns={"attraction_name": "attraction", "attraction_type": "type", "attraction_rank": "rank", "attraction_duration": "duration", "attraction_lat": "lat", "attraction_lng": "lng"})
+    df = df.rename(index=str, columns={"attraction_name": "attraction", "attraction_link": "link", "attraction_rating": "rating", "attraction_type": "type", "attraction_rank": "rank", "attraction_duration": "duration", "attraction_lat": "lat", "attraction_lng": "lng"})
 
     # combine lat and lng as 'location' and add to the dataframe
     loc = list()
@@ -21,7 +22,7 @@ class App(object):
         b = df['lng'][i]
         loc.append((a, b))
     df['location'] = loc
-    df.drop(columns = ['attraction_rating'])
+    df.drop(columns = ['rating'])
     
     list_=df['type'].unique()
     att_list=df['attraction']
@@ -43,7 +44,7 @@ class App(object):
         self.current_row=0
         
         #api key
-        self.api_label=tk.Label(window,text="Your API key:")
+        self.api_label=tk.Label(window,text="Your API key: (*)")
         self.api_label.grid(row=self.current_row, column=0)
         self.api_text=tk.StringVar()
         self.api_entry=tk.Entry(window, textvariable=self.api_text)
@@ -51,7 +52,7 @@ class App(object):
         self.current_row+=1
         
         # Hotel address
-        self.home_label=tk.Label(window,text="Your hotel address:")
+        self.home_label=tk.Label(window,text="Your hotel address: (*)")
         self.home_label.grid(row=self.current_row, column=0)
         self.home_text=tk.StringVar()
         self.home_entry=tk.Entry(window, textvariable=self.home_text)
@@ -59,9 +60,8 @@ class App(object):
         self.current_row+=1
 
         #duration
-        self.duration_label=tk.Label(window,text="Your everyday travel duration is:")
+        self.duration_label=tk.Label(window,text="Your everyday travel duration is: (*)")
         self.duration_label.grid(row=self.current_row, column=0)
-        self.duration_text=tk.DoubleVar()
         self.duration_text=tk.IntVar()
         self.duration_entry=tk.Entry(window, textvariable=self.duration_text)
         self.duration_entry.grid(row=self.current_row, column=1)
@@ -97,9 +97,8 @@ class App(object):
         self.current_row+=1 
         
         #sort
-        self.sort_label=tk.Label(window,text="Sort by:")
+        self.sort_label=tk.Label(window,text="Sort by: (*)")
         self.sort_label.grid(row=self.current_row, column=0)
-        #####----------change this-----------####
         list_=["distance","rank"]
         self.sort_text=StringVar()
         self.sort_entry=OptionMenu(window, self.sort_text, *list_)
@@ -118,12 +117,14 @@ class App(object):
         self.quit_button.grid(row=self.current_row, column=1, columnspan=1)
         self.current_row+=1
        
-
+    #define function that will be envoked after clicking the OK button 
     def fetch(self):
         #create local variable
         home=self.home_text.get()
         time=self.duration_text.get()
-        
+        if time==0:
+            time=24
+            
         #realize storing api_key later
         api_key=self.api_text.get()
 
@@ -138,12 +139,19 @@ class App(object):
         for x in range(len(self.pref_list)):
             if self.var_list[x].get()==1:
                 preference.append(self.pref_list[x])
+        if len(preference)==0:
+            preference=self.pref_list
                 
-        #citypass=self.cp_text.get()
+
         sort=self.sort_text.get()
+        if not sort:
+            sort="rank"
         
         dff=self.recommendation(self.df, home, place_have_been, preference, sort, api_key, duration = time)
         display(dff)
+        
+        print("Please be patient! Your travel map is now processing...")
+        
         dff['address'] = dff.apply(lambda x: self.get_address(x['attraction'],api_key),axis=1)
         
         get_ipython().magic('matplotlib inline')
@@ -180,7 +188,12 @@ class App(object):
         ## result!
         route = results[0][0]
         distance_total = results[0][1]
-        
+        route_string = ''
+        for i in route:
+            route_string += i + ' --> '
+        route_string += route[0]
+        print(f'Optimized travel path is {route_string}.')
+        print(f'Total distance is {distance_total} miles.')
 
         ## edges of the result
         route_edges = [(route[i],route[i+1]) for i in range(len(route)-1)]
@@ -190,17 +203,18 @@ class App(object):
         dff2 = dff2.append([{'attraction':home,'lat':self.get_lat_lng(home,api_key)[0],'lng':self.get_lat_lng(home,api_key)[1]}], ignore_index=True)
         
         display(self.get_map(home,dff,dff2, route_edges, api_key))
-
+        
+        print("Now it's the time to enjoy your journey! :)")
+        
     def get_map(self,startpoint,dff,dff2, route_edges, api_key):
         startpoint_ll = self.get_lat_lng(startpoint,api_key)
         m = folium.Map(location=startpoint_ll,zoom_start=14)
         icon_hz = dict(prefix='fa', color='red', icon_color='darkred', icon='cny')
-        folium.Marker(startpoint_ll, popup = startpoint,icon=folium.Icon(color='green')).add_to(m)
+        folium.Marker(startpoint_ll, popup = "You are here: "+ startpoint,icon=folium.Icon(color='green')).add_to(m)
         for i in range(len(dff)):
-                folium.Marker([dff.iloc[i]['lat'],dff.iloc[i]['lng']],
+            folium.Marker([dff.iloc[i]['lat'],dff.iloc[i]['lng']],
                             popup='Attraction: '+dff.iloc[i]['attraction']+ ';   Address: '+dff.iloc[i]['address']
-                          + ';   duration: ' +str(dff.iloc[i]['duration'])+';   type: ' +dff.iloc[i]['type']
-                          + ';   link: ' +dff.iloc[i]['attraction_link']
+                          + ';   Duration: ' +str(dff.iloc[i]['duration'])+' hour(s)'
                              ).add_to(m)
         for i in route_edges:
             lat1 = dff2[dff2['attraction']==i[0]]['lat'].iloc[0]
@@ -223,7 +237,7 @@ class App(object):
                 try:
                     response_data = response.json()
                 except:
-                    print("Response not in valid JSON format")
+                    print("Your API key may be invalid")
         except:
             print("Something went wrong with requests.get")
         return response_data
@@ -295,7 +309,7 @@ class App(object):
                     duration = response.json()['routes'][0]['legs'][0]['duration']['text'].split()[0]
                     return (float(distance),float(duration))
                 except:
-                    print("Response not in valid JSON format")
+                    print("Your API key may be invalid")
         except:
             print("Something went wrong with requests.get")
 
