@@ -1,10 +1,11 @@
 ## Path Planner: Your Best Travel Partner in the City of New York :statue_of_liberty:     
 
-### What is it?  
+### What is it?   
 ---
-**Path Advisor** is a graphical user interface to design the sightseeing routes for tourists. 
+**Path Planner** is a graphical user interface to design the sightseeing routes for tourists. 
 After some basic settings like your `current location` and `travel preferences`, 
-you will see our **designed route** in **blue line** and **suggested attractions** in **blue pins** shown in the real map.
+you will see our **designed route** in **blue line** and **suggested attractions** in **blue pins** shown in the real map.  
+We believe our plan would match you perfectly based on our sufficient data fetched from **Tripadvisor** and we have prepared top `71` attractions in New York City which can definitly meet all your travel needs!
 
 ### Who are we?  :two_women_holding_hands::two_women_holding_hands:
 ---
@@ -42,9 +43,9 @@ And you want to firstly visit the attractions which is nearst to you.
     
 ### What will you see :outbox_tray:    
 ---
-Your start point is shown by green point
-The route is represented by blue lines  
-The attractions that we have picked for you is shown by blue pins :round_pushpin:  
+Your start point is shown by green point :herb:  
+The route is represented by blue lines :wavy_dash:  
+The attractions that we have picked for you is shown by blue pins :small_blue_diamond:  
 ![The example output](https://raw.githubusercontent.com/FinalProject0b1100100/tfa_project/master/output.png) 
 What's more, considerable as we are, if you click the blue pins, you will see the detail information of the attarctions like name, address, suggested viewing time and the type.  
 
