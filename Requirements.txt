@@ -1,20 +1,20 @@
 Equipments to Explore Path Planner
 
 1. Some Python Packages
-    ££ Packages for data scraping
+    # Packages for data scraping
 	import requests
 	from bs4 import BeautifulSoup
 	import datetime
 	import pandas as pd
 	import csv
-    ££ Packages for GUI (if repeated, omitted)
+    # Packages for GUI (if repeated, omitted)
 	import os
 	import tkinter as tk
 	from tkinter import *
 	from tkinter import messagebox
-    ££Packages for recommandation
+    # Packages for recommandation
 	import math
-    ££Packages for data visualization
+    # Packages for data visualization
 	import matplotlib.pyplot as plt
 	import networkx as nx
 	import folium
