@@ -76,5 +76,5 @@ What's more, considerable as we are, if you click the blue pins, you will see th
 |data_with_location.csv|The data set that contains all useful information(name, type, rank, duration, latitude and longitude, etc.) of each attration in NYC|
 |File.py|This file defines functions to get Google Map by API and plan the ordered path between each location. It also has functions to display the information and pin of the location from the data frame|
 |Final Project.py|Python file version of final version of the completed project. It is able to take input from GUI, get the recommend attrations, and plot the on the Google Map with travel details|
-|Final Project.ipynb|Jupter notebook file version of final version of the completed project.|
+|Final Project.ipynb|Jupter notebook file version of final version of the completed project|
 
