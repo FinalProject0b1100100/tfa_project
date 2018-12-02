@@ -21,20 +21,29 @@ you will see our **designed route** in **blue line** and **suggested attractions
 **Installation Instructions** :ledger:  
 After reading this [Requirements](tfa_project/Requirements.txt) :page_with_curl:, you are ready to go!    
 **Input Setting** :inbox_tray:
-- [x]  This is the start point of your day trip and is necessary. It can be your current location or the future hotel location in your plan.    
-- [ ]  Please input your estimated play time and this is the pure sightviewing time without transportation.  
+- [x] Your API key: This the API key described in the Requirements 
+- [x] Your hotel address: This is the start point of your day trip and is necessary. It can be your current location or the future hotel location in your plan.    
+- [ ] Duration: Please input your estimated play time and this is the pure sightviewing time without transportation.  
+- [ ]  Please select the attractions that you have visited before, and you can select none or more than one.  
 - [ ]  Please select your preferred type of attractions, and you can select noen or more than one. 
-- [ ]  Please select the attractions that you have visited before, and you can select none or more than one.
 - [x]  Please choose your priority when picking attarctions.  
 **For example**  
 If you were the `first time` been New York City, and you started from `Columbia University`.   
 You are an enthusiastic `art fan` and you want to vist some famous `museums`.  
 After enjoying the art, you want to experience the `neighborhood`.
 Your estimated playing time is around `6` hours.
-![The example input](URL)  
+And you want to firstly visit the attractions which is nearst to you.
+![The example input](tfa_project/input1.png)  
+![The example input](tfa_project/input2.png)  
+![The example input](tfa_project/input3.png)  
 **Press the OK botton and wait for the perfect path we designed for you!**
     
 ### What will you see :outbox_tray:    
 ---
-The route is represented by blue lines and the attractions that we have picked for you is shown by green pins :round_pushpin:   
-![The example output](URL) 
+Your start point is shown by green point
+The route is represented by blue lines  
+The attractions that we have picked for you is shown by blue pins :round_pushpin:  
+![The example output](tfa_project/output.png) 
+What's more, considerable as we are, if you click the blue pins, you will see the detail information of the attarctions like name, address, suggested viewing time and the type.  
+
+### Now let's try it and travel the New York City :sunrise: :mount_fuji: :rainbow: :stars:     
