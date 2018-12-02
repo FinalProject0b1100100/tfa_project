@@ -46,7 +46,7 @@ And you want to firstly visit the attractions which is nearst to you.
 ![The example input](https://raw.githubusercontent.com/FinalProject0b1100100/tfa_project/master/input2.png)  
 
 #### Press the OK botton and return to [final project.ipynb](https://github.com/FinalProject0b1100100/tfa_project/blob/master/final%20project.ipynb) 
-Please wait a minute for the perfect path we designed for you!
+Please wait a minute for the perfect path we designed for you!  
     
 ### What you will see :outbox_tray:    
 ---
@@ -65,4 +65,12 @@ The attractions that we have picked for you is shown by blue pins :small_blue_di
 
 What's more, considerable as we are, if you click the blue pins, you will see the detail information of the attarctions like name, address, suggested viewing time and the type.  
 
-## Now let's try it and travel the New York City :sunrise: :mount_fuji: :rainbow: :stars:     
+## Now let's try it and travel the New York City :sunrise: :mount_fuji: :rainbow: :stars:    
+
+### Appendix  
+|File Name|Description|
+|---|---|---|
+|Qinya Li|ql2333|Section002|
+|Yanghuizi Wang|yw3189|Section002|
+|Weiyi Huang|wh2422|Section002|
+|Luokun Ren|lr2897|Section002|
