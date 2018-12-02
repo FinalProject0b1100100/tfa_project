@@ -1,0 +1,25 @@
+Equipments to Explore Path Planner
+£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½====
+1. Some Python Packages
+    ££ Packages for data scraping
+	import requests
+	from bs4 import BeautifulSoup
+	import datetime
+	import pandas as pd
+	import csv
+    ££ Packages for GUI (if repeated, omitted)
+	import os
+	import tkinter as tk
+	from tkinter import *
+	from tkinter import messagebox
+    ££Packages for recommandation
+	import math
+    ££Packages for data visualization
+	import matplotlib.pyplot as plt
+	import networkx as nx
+	import folium
+£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½£½====
+2. Google Maps API key
+Google Maps API key is literally the key to open this path planner.
+Click this link: https://cloud.google.com/console/google/maps-apis/overview, you will own your own API keys immediately.
+Click this link: https://developers.google.com/maps/documentation/maps-static/get-api-key, you will know how to install and use your keys step by step.
