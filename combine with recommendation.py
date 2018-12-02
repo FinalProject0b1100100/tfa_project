@@ -37,7 +37,14 @@ class App(object):
 
         window.wm_title("Travel Assistant")
         self.current_row=0
-
+        #api key
+        self.api_label=tk.Label(window,text="Your API key:")
+        self.api_label.grid(row=self.current_row, column=0)
+        self.api_text=tk.StringVar()
+        self.api_entry=tk.Entry(window, textvariable=self.api_text)
+        self.api_entry.grid(row=self.current_row, column=1)
+        self.current_row+=1
+        
         # Hotel address
         self.home_label=tk.Label(window,text="Your hotel address:")
         self.home_label.grid(row=self.current_row, column=0)
@@ -112,7 +119,10 @@ class App(object):
         #create local variable
         home=self.home_text.get()
         time=self.duration_text.get()
-
+        #realize storing api_key later
+        api_key=self.api_text.get()
+        
+        
         #place_have_been
         place_have_been=[]
         for x in range(len(self.phb_list)):
